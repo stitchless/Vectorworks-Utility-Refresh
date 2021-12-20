@@ -11,6 +11,8 @@ import (
 	"github.com/jpeizer/Vectorworks-Utility-Refresh/internal/renderers"
 )
 
+// TODO: set theme from https://github.com/AllenDang/giu/blob/b3e4ae718b3a78be20ccc69748f7fc96ea7b65f1/MasterWindow.go
+
 func main() {
 	context := imgui.CreateContext(nil)
 	defer context.Destroy()
