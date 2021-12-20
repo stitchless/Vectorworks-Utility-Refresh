@@ -60,7 +60,7 @@ func NewGLFW(io imgui.IO, clientAPI GLFWClientAPI) (*GLFW, error) {
 		return nil, fmt.Errorf("failed to create window: %w", err)
 	}
 	window.MakeContextCurrent()
-	glfw.SwapInterval(1)
+	glfw.SwapInterval(1) // enable vsync
 
 	platform := &GLFW{
 		imguiIO: io,
@@ -100,7 +100,7 @@ func (platform *GLFW) FramebufferSize() [2]float32 {
 	return [2]float32{float32(w), float32(h)}
 }
 
-// NewFrame marks the begin of a render pass. It forwards all current state to imgui IO.
+// NewFrame marks the beginning of a render pass. It forwards all current state to imgui IO.
 func (platform *GLFW) NewFrame() {
 	// Setup display size (every frame to accommodate for window resizing)
 	displaySize := platform.DisplaySize()

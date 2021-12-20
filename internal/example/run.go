@@ -51,7 +51,7 @@ type Renderer interface {
 
 const (
 	millisPerSecond = 1000
-	sleepDuration   = time.Millisecond * 25
+	sleepDuration   = time.Millisecond * 5
 )
 
 // Run implements the main program loop of the demo. It returns when the platform signals to stop.
@@ -132,6 +132,6 @@ func Run(p Platform, r Renderer) {
 		p.PostRender()
 
 		// sleep to avoid 100% CPU usage for this demo
-		<-time.After(sleepDuration)
+		//<-time.After(sleepDuration)
 	}
 }
