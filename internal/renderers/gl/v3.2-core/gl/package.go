@@ -6,7 +6,7 @@
 // http://opencontent.org/openpub/.
 //
 // Copyright (c) 1991-2006 Silicon Graphics, Inc.
-// This document is licensed under the SGI Free Software B License.
+// This document is licensed under the SGI Free software B License.
 // For details, see http://oss.sgi.com/projects/FreeB.
 
 // Package gl implements Go bindings to OpenGL.

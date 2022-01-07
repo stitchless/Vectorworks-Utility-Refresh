@@ -2,6 +2,7 @@ package example
 
 import (
 	"fmt"
+	"github.com/jpeizer/Vectorworks-Utility-Refresh/internal/ui"
 	"time"
 
 	"github.com/inkyblackness/imgui-go/v4"
@@ -62,9 +63,7 @@ func Run(p Platform, r Renderer) {
 	showDemoWindow := false
 	showGoDemoWindow := false
 	clearColor := [3]float32{0.0, 0.0, 0.0}
-	f := float32(0)
-	counter := 0
-	showAnotherWindow := false
+	showDebugWindow := true
 
 	for !p.ShouldStop() {
 		p.ProcessEvents()
@@ -73,36 +72,45 @@ func Run(p Platform, r Renderer) {
 		p.NewFrame()
 		imgui.NewFrame()
 
-		// 1. Show a simple window.
-		// Tip: if we don't call imgui.Begin()/imgui.End() the widgets automatically appears in a window called "Debug".
-		{
-			imgui.Text("ภาษาไทย测试조선말")                   // To display these, you'll need to register a compatible font
-			imgui.Text("Hello, world!")                  // Display some text
-			imgui.SliderFloat("float", &f, 0.0, 1.0)     // Edit 1 float using a slider from 0.0f to 1.0f
-			imgui.ColorEdit3("clear color", &clearColor) // Edit 3 floats representing a color
+		//1. Show a simple window.
+		//Tip: if we don't call imgui.Begin()/imgui.End() the widgets automatically appears in a window called "Debug".
+		if showDebugWindow {
+			size := p.DisplaySize()
+			imgui.SetNextWindowPos(imgui.Vec2{X: 0, Y: 0})
 
-			imgui.Checkbox("Demo Window", &showDemoWindow) // Edit bools storing our window open/close state
-			imgui.Checkbox("Go Demo Window", &showGoDemoWindow)
-			imgui.Checkbox("Another Window", &showAnotherWindow)
+			imgui.SetNextWindowSize(imgui.Vec2{X: size[0], Y: size[1]})
 
-			if imgui.Button("Button") { // Buttons return true when clicked (most widgets return true when edited/activated)
-				counter++
+			imgui.BeginV("Debug Window", &showDebugWindow,
+				imgui.WindowFlagsNoTitleBar|
+					imgui.WindowFlagsNoCollapse|
+					imgui.WindowFlagsNoScrollbar|
+					imgui.WindowFlagsNoMove|
+					imgui.WindowFlagsNoResize)
+
+			numberOfButtons := len(ui.AllActiveFeatures)
+
+			imgui.BeginTableV("Features##TopMenuBar", numberOfButtons, 0, imgui.Vec2{X: -1, Y: 30}, -1)
+			imgui.TableNextRowV(0, 30)
+
+			for _, activeFeature := range ui.AllActiveFeatures {
+				if ui.CurrentFeature == "" {
+					ui.CurrentFeature = activeFeature
+				}
+
+				imgui.TableNextColumn()
+				imgui.PushID(activeFeature.String())
+
+				if imgui.ButtonV(activeFeature.String(), imgui.Vec2{X: -1, Y: 30}) {
+					activeFeature.SetActive()
+					fmt.Println("Active Feature:", activeFeature.String())
+				}
+
+				imgui.PopID()
 			}
-			imgui.SameLine()
-			imgui.Text(fmt.Sprintf("counter = %d", counter))
 
-			imgui.Text(fmt.Sprintf("Application average %.3f ms/frame (%.1f FPS)",
-				millisPerSecond/imgui.CurrentIO().Framerate(), imgui.CurrentIO().Framerate()))
-		}
+			imgui.EndTable()
 
-		// 2. Show another simple window. In most cases you will use an explicit Begin/End pair to name your windows.
-		if showAnotherWindow {
-			// Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-			imgui.BeginV("Another window", &showAnotherWindow, 0)
-			imgui.Text("Hello from another window!")
-			if imgui.Button("Close Me") {
-				showAnotherWindow = false
-			}
+			ui.CurrentFeature.Render()
 			imgui.End()
 		}
 
@@ -125,8 +133,8 @@ func Run(p Platform, r Renderer) {
 		imgui.Render() // This call only creates the draw data list. Actual rendering to framebuffer is done below.
 
 		r.PreRender(clearColor)
-		// A this point, the application could perform its own rendering...
-		// app.RenderScene()
+		// At this point, the application could perform its own rendering...
+		//app.RenderScene()
 
 		r.Render(p.DisplaySize(), p.FramebufferSize(), imgui.RenderedDrawData())
 		p.PostRender()
