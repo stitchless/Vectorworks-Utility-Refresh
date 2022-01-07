@@ -118,7 +118,7 @@ func Show(keepOpen *bool) {
 		imgui.Text("PROGRAMMER GUIDE:")
 		bulletText("See the demo.Show() code in internal/demo/Window.go. <- you are here!")
 		bulletText("See comments in imgui.cpp.")
-		bulletText("See example applications in the examples/ folder.")
+		bulletText("See app applications in the examples/ folder.")
 		bulletText("Read the FAQ at http://www.dearimgui.org/faq/")
 		bulletText("Set 'io.ConfigFlags |= NavEnableKeyboard' for keyboard controls.")
 		bulletText("Set 'io.ConfigFlags |= NavEnableGamepad' for gamepad controls.")

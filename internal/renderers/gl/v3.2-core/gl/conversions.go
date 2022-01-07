@@ -15,7 +15,7 @@ import "C"
 // Ptr takes a slice or pointer (to a singular scalar value or the first
 // element of an array or slice) and returns its GL-compatible address.
 //
-// For example:
+// For app:
 //
 // 	var data []uint8
 // 	...
@@ -53,7 +53,7 @@ func Ptr(data interface{}) unsafe.Pointer {
 // parameters also for offsets, since Go 1.14 this is no longer recommended.
 //
 // Use a corresponding offset-compatible variant of the function instead.
-// For example, for gl.VertexAttribPointer() there is gl.VertexAttribPointerWithOffset().
+// For app, for gl.VertexAttribPointer() there is gl.VertexAttribPointerWithOffset().
 //
 // See https://github.com/go-gl/gl#go-114-and-checkptr for more details on the checkptr detector.
 // See https://github.com/go-gl/glow#overloads, about adding new overloads.

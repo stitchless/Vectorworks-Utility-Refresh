@@ -55,7 +55,7 @@ func RenderSoftware() {
 					// Cog Icon button
 					imgui.SameLine()
 					//imgui.PushFont(FontAwesome)
-					if imgui.Button("\uF013" + "##" + installation.Year + "licenseButton") {
+					if imgui.Button("info" + "##" + installation.Year + "licenseButton") {
 						toggleSerialDetails = !toggleSerialDetails
 					}
 					//imgui.PopFont()
@@ -78,25 +78,28 @@ func RenderSoftware() {
 						imgui.Text(installation.License.Type)
 						imgui.EndTable()
 					}
-					imgui.Dummy(imgui.Vec2{X: -1, Y: 5})
+
+					imgui.LabelText("##"+softwareName+installation.Year+"licenseLabel", "Clear Data Options")
+					imgui.BeginTableV("##"+installation.Year+"SoftwareActions", 5, imgui.TableFlagsSizingFixedFit, imgui.Vec2{X: -1, Y: 30}, -1)
+					imgui.TableNextRow()
+					imgui.TableNextColumn()
+					if imgui.Button(" Resource Manager Cache " + "##" + installation.Year + "RMC") {
+						//software.ClearInstalledSoftware(installation)
+						//err := software.GenerateInstalledSoftwareMap()
+						//if err != nil {
+						//	fmt.Errorf("error updating internal installation data after serial update %v", err)
+						//}
+					}
+					imgui.EndTable()
+
+					//imgui.Dummy(imgui.Vec2{X: -1, Y: 5})
 					imgui.BeginChildV("##softwareContentChild", imgui.ContentRegionAvail(), true, 0)
 
 					//////////
 					// Edit Serial
 					//////////
-					imgui.BeginTableV("##"+installation.Year+"SoftwareActions", 5, imgui.TableFlagsSizingFixedFit, imgui.Vec2{X: -1, Y: 30}, -1)
-					//imgui.TableNextRow(0, 30)
-					imgui.NextColumn()
-					imgui.Text("Resource Manager Cache")
-					imgui.NextColumn()
-					imgui.Button("Clean")
-					imgui.NextColumn()
-					imgui.Button("Rename")
-					imgui.NextColumn()
-					imgui.Text("Test")
-					imgui.NextColumn()
-					imgui.Text("Last")
-					imgui.EndTable()
+					imgui.Text("Edit Serial")
+
 					//////////
 					// Clear User Data
 					//////////

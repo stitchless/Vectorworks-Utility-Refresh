@@ -30,3 +30,13 @@ var AllActiveSoftwareNames = []SoftwareName{
 	SoftwareVision,
 	SoftwareCloudServices,
 }
+
+func (s Software) String() string {
+	return s.Name
+}
+
+func (s Software) ClearRMCache() {
+	//for _, installation := range s.Installations {
+	//	installation.ClearRMCache()
+	//}
+}

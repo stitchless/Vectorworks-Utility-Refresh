@@ -6,7 +6,7 @@ import (
 
 	"github.com/inkyblackness/imgui-go/v4"
 
-	"github.com/jpeizer/Vectorworks-Utility-Refresh/internal/example"
+	"github.com/jpeizer/Vectorworks-Utility-Refresh/internal/app"
 	"github.com/jpeizer/Vectorworks-Utility-Refresh/internal/platforms"
 	"github.com/jpeizer/Vectorworks-Utility-Refresh/internal/renderers"
 )
@@ -32,5 +32,5 @@ func main() {
 	}
 	defer renderer.Dispose()
 
-	example.Run(platform, renderer)
+	app.Run(platform, renderer)
 }

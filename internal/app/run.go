@@ -1,4 +1,4 @@
-package example
+package app
 
 import (
 	"fmt"
@@ -75,15 +75,15 @@ func Run(p Platform, r Renderer) {
 		//1. Show a simple window.
 		//Tip: if we don't call imgui.Begin()/imgui.End() the widgets automatically appears in a window called "Debug".
 		if showDebugWindow {
+			// Sets window size to be the same as the framebuffer size
 			size := p.DisplaySize()
 			imgui.SetNextWindowPos(imgui.Vec2{X: 0, Y: 0})
-
 			imgui.SetNextWindowSize(imgui.Vec2{X: size[0], Y: size[1]})
 
-			imgui.BeginV("Debug Window", &showDebugWindow,
+			// Set the window to be a fixed size
+			imgui.BeginV("Main Window", &showDebugWindow,
 				imgui.WindowFlagsNoTitleBar|
 					imgui.WindowFlagsNoCollapse|
-					imgui.WindowFlagsNoScrollbar|
 					imgui.WindowFlagsNoMove|
 					imgui.WindowFlagsNoResize)
 
@@ -100,10 +100,20 @@ func Run(p Platform, r Renderer) {
 				imgui.TableNextColumn()
 				imgui.PushID(activeFeature.String())
 
-				if imgui.ButtonV(activeFeature.String(), imgui.Vec2{X: -1, Y: 30}) {
+				var pressed bool
+
+				if ui.CurrentFeature == activeFeature {
+					imgui.PushStyleColor(imgui.StyleColorButton, imgui.Vec4{X: 0.06, Y: 0.53, Z: 0.98, W: 1.00})
+				} else {
+					imgui.PushStyleColor(imgui.StyleColorButtonActive, imgui.Vec4{X: 0.06, Y: 0.53, Z: 0.98, W: 1.00})
+				}
+
+				if imgui.ButtonV(activeFeature.String()+"##tab", imgui.Vec2{X: -1, Y: 30}) {
 					activeFeature.SetActive()
+					pressed = !pressed
 					fmt.Println("Active Feature:", activeFeature.String())
 				}
+				imgui.PopStyleColor()
 
 				imgui.PopID()
 			}
