@@ -1,5 +1,9 @@
 package ui
 
+import (
+	"github.com/inkyblackness/imgui-go/v4"
+)
+
 // featureName provides the user readable string for a supported software package
 type featureName string
 
@@ -15,7 +19,7 @@ const (
 var AllActiveFeatures = []featureName{
 	featureSoftware,
 	featureTraceApplication,
-	//featureDemoWindow,
+	featureDemoWindow,
 	//featureSettings,
 }
 
@@ -42,8 +46,9 @@ func (f featureName) Render() {
 		RenderSoftware()
 	case featureTraceApplication:
 		RenderTraceApplication()
-	//case featureDemoWindow:
-	//	RenderDemoWindow()
+	case featureDemoWindow:
+		open := true
+		imgui.ShowDemoWindow(&open)
 	//case featureSettings:
 	//	RenderSettings()
 	default:

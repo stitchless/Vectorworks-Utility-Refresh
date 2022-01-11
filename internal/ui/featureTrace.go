@@ -55,7 +55,7 @@ func RenderTraceApplication() {
 	imgui.BeginTabBar("##softwareLogsTabBar")
 
 	if imgui.BeginTabItem("Software Trace##softwareTraceTabItem") {
-		imgui.BeginChildV("##traceTabWindow", imgui.Vec2{X: -1, Y: imgui.WindowHeight() - 111}, true, 0)
+		imgui.BeginChildV("##traceTabWindow", imgui.Vec2{X: -1, Y: imgui.ContentRegionAvail().Y}, true, 0)
 		imgui.Checkbox("Trail Logs", &trailTraceLogs)
 		bufferString := traceBuffer.String()
 		// 14 == InputTextFlagsReadOnly | 16 == InputTextFlagsNoUndoRedo || InputText.go
@@ -68,7 +68,7 @@ func RenderTraceApplication() {
 	}
 
 	if imgui.BeginTabItem("Software Logs##softwareLogsTabItem") {
-		imgui.BeginChildV("##logTabWindow", imgui.Vec2{X: -1, Y: imgui.WindowHeight() - 111}, true, 0)
+		imgui.BeginChildV("##logTabWindow", imgui.Vec2{X: -1, Y: imgui.ContentRegionAvail().Y}, true, 0)
 		logBufferString := logBuffer.String()
 		logWindowHeight := float32(bytes.Count(logBuffer.Bytes(), []byte("\n")))*imgui.TextLineHeight() + imgui.TextLineHeight()
 		showLogs()

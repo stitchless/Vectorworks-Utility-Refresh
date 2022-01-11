@@ -117,3 +117,27 @@ func getType(serial []string) string {
 	}
 	return "License type not found"
 }
+
+func RemoveResourceManagerCache(installation Installation) error {
+	return nil
+}
+
+func RemoveUserData(installation Installation) error {
+	return nil
+}
+
+//func (installation *Installation) CreateModal() {
+//	imgui.BeginPopupModalV("Remove Software", nil, 0)
+//	imgui.Text("Are you sure you want to remove this software?")
+//	imgui.Separator()
+//	imgui.Text("This will remove all files associated with this software.")
+//	imgui.Separator()
+//	imgui.Text("This action cannot be undone.")
+//	imgui.Separator()
+//	imgui.Text(installation.SoftwareName)
+//	if imgui.Button("Cancel") {
+//		imgui.CloseCurrentPopup()
+//	}
+//
+//	imgui.EndPopup()
+//}

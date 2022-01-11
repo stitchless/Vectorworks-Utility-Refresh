@@ -6,8 +6,6 @@ import (
 	"time"
 
 	"github.com/inkyblackness/imgui-go/v4"
-
-	"github.com/jpeizer/Vectorworks-Utility-Refresh/internal/demo"
 )
 
 // Platform covers mouse/keyboard/gamepad inputs, cursor shape, timing, windowing.
@@ -61,7 +59,6 @@ func Run(p Platform, r Renderer) {
 	imgui.CurrentIO().SetClipboard(clipboard{platform: p})
 
 	showDemoWindow := false
-	showGoDemoWindow := false
 	clearColor := [3]float32{0.0, 0.0, 0.0}
 	showDebugWindow := true
 
@@ -135,9 +132,9 @@ func Run(p Platform, r Renderer) {
 
 			imgui.ShowDemoWindow(&showDemoWindow)
 		}
-		if showGoDemoWindow {
-			demo.Show(&showGoDemoWindow)
-		}
+		//if showGoDemoWindow {
+		//	demo.Show()
+		//}
 
 		// Rendering
 		imgui.Render() // This call only creates the draw data list. Actual rendering to framebuffer is done below.

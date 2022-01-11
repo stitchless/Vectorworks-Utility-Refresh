@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/jpeizer/Vectorworks-Utility-Refresh/internal/utils"
 	"os"
 
 	"github.com/inkyblackness/imgui-go/v4"
@@ -17,6 +18,8 @@ func main() {
 	context := imgui.CreateContext(nil)
 	defer context.Destroy()
 	io := imgui.CurrentIO()
+
+	utils.LoadFonts()
 
 	platform, err := platforms.NewGLFW(io, platforms.GLFWClientAPIOpenGL3)
 	if err != nil {

@@ -2,7 +2,6 @@ package demo
 
 import (
 	"fmt"
-
 	"github.com/inkyblackness/imgui-go/v4"
 )
 
@@ -67,18 +66,19 @@ func bulletText(text string) {
 	imgui.Text(text)
 }
 
-// Show demonstrates most ImGui features that were ported to Go.
+// RenderDemo demonstrates most ImGui features that were ported to Go.
 // This function tries to recreate the original demo window as closely as possible.
 //
 // In theory, if both windows would provide the identical functionality, then the wrapper would be complete.
-func Show(keepOpen *bool) {
-	imgui.SetNextWindowPosV(imgui.Vec2{X: 650, Y: 20}, imgui.ConditionFirstUseEver, imgui.Vec2{})
+func RenderDemo() {
+	const demoX = 650
+	const demoY = 20
+	imgui.SetNextWindowPosV(imgui.Vec2{X: demoX, Y: demoY}, imgui.ConditionFirstUseEver, imgui.Vec2{})
 	imgui.SetNextWindowSizeV(imgui.Vec2{X: 550, Y: 680}, imgui.ConditionFirstUseEver)
 
-	if window.noClose {
-		keepOpen = nil
-	}
-	if !imgui.BeginV("ImGui-Go Demo", keepOpen, window.flags.combined()) {
+	keepOpen := true
+
+	if !imgui.BeginV("ImGui-Go Demo", &keepOpen, window.flags.combined()) {
 		// Early out if the window is collapsed, as an optimization.
 		imgui.End()
 		return
