@@ -54,23 +54,53 @@ func RenderSoftware() {
 						imgui.SetTooltip("Insert new serial and press enter to update")
 					}
 
-					// Cog Icon button
+					// Installation Info Button
 					imgui.SameLine()
 					imgui.PushFont(utils.FontAwesomeLight)
-					if imgui.Button("\uF05A" + "##" + installation.Year + "licenseButton") {
+					if imgui.ButtonV("\uF05A Info"+"##"+installation.Year+"licenseButton", imgui.Vec2{X: 70, Y: 25}) {
 						toggleSerialDetails = !toggleSerialDetails
 					}
 
-					//installation.CreateModal()
-					var open bool = true
-					imgui.BeginPopupModalV("##RemoveSoftware", &open, 0)
-					if imgui.Button("Cancel") {
-						imgui.CloseCurrentPopup()
+					// License Cleanup Button
+					if imgui.BeginPopupModalV("Clean Software", nil, imgui.WindowFlagsAlwaysAutoResize) {
+						imgui.Text("Select the options below to clean the software.")
+
+						imgui.Separator()
+						imgui.Dummy(imgui.Vec2{X: 0, Y: 5})
+
+						imgui.Checkbox("Remove resource manager cache##RMC", &installation.Options.RemoveRMC)
+						imgui.Checkbox("Remove user data##RMUD", &installation.Options.RemoveUserData)
+						imgui.Checkbox("Remove user settings##RMUS", &installation.Options.RemoveUserSettings)
+						imgui.Checkbox("Remove installer files##RMIF", &installation.Options.RemoveInstallerSettings)
+						imgui.Checkbox("Remove all user data##RMALL", &installation.Options.RemoveAllData)
+
+						imgui.Dummy(imgui.Vec2{X: 0, Y: 5})
+						imgui.Separator()
+						imgui.Dummy(imgui.Vec2{X: 0, Y: 5})
+
+						if imgui.Button("Remove") {
+
+							//"Remove user data",
+							//"Remove user settings",
+							//"Remove installer files",
+							//"Remove all user data",
+							//software.RemoveSoftware(installation)
+							imgui.CloseCurrentPopup()
+							err := software.GenerateInstalledSoftwareMap()
+							if err != nil {
+								fmt.Errorf("error updating internal installation data after serial update %v", err)
+							}
+						}
+						imgui.SameLine()
+						if imgui.Button("Cancel") {
+							imgui.CloseCurrentPopup()
+						}
+						imgui.EndPopup()
 					}
 
 					imgui.SameLine()
-					if imgui.Button("\uF12D" + "##CleanDialog") {
-						imgui.OpenPopup("RemoveSoftware")
+					if imgui.ButtonV("\uF12D Clean"+"##CleanDialog", imgui.Vec2{X: 80, Y: 25}) {
+						imgui.OpenPopup("Clean Software")
 					}
 					if imgui.IsItemHovered() {
 						imgui.SetTooltip("Clean up this installation of software")
@@ -117,50 +147,6 @@ func RenderSoftware() {
 					// ----------------------------
 					// LAYOUT FOR SOFTWARE FEATURES
 					// ----------------------------
-					//imgui.BeginChildV("Options ##"+softwareName+installation.Year+"licenseChild", imgui.Vec2{X: 0, Y: 0}, true, 0)
-
-					groupWidth := imgui.ContentRegionAvail().X * .30
-
-					imgui.PushItemWidth(groupWidth)
-
-					imgui.BeginGroup()
-					imgui.PushFont(utils.FontRobotoBold)
-					imgui.Text("Options")
-					imgui.PopFont()
-
-					//imgui.Text("Remove Resource Manage Cache")
-					//imgui.SameLine()
-					if imgui.ButtonV("Remove Resource Manager Cache##RMRMCacheButton", imgui.Vec2{X: groupWidth, Y: 0}) {
-						err := software.RemoveResourceManagerCache(installation)
-						if err != nil {
-							fmt.Errorf("error removing Resource Manager Cache %v", err)
-						}
-
-						fmt.Println("Removed Resource Manager Cache")
-					}
-
-					if imgui.ButtonV("Remove User Data##RMUserDataButton", imgui.Vec2{X: groupWidth, Y: 0}) {
-						err := software.RemoveUserData(installation)
-						if err != nil {
-							fmt.Errorf("error removing User Data %v", err)
-						}
-
-						fmt.Println("Removed User Data")
-					}
-
-					imgui.ListBox("##optionsBody", &item, []string{
-						"Remove resource manager cache",
-						"Remove user data",
-						"Remove user settings",
-						"Remove installer files",
-						"Remove all user data",
-					})
-
-					imgui.Text("Select an option above to modify your install")
-					imgui.EndGroup()
-					imgui.PopItemWidth()
-
-					imgui.SameLine()
 					imgui.BeginGroup()
 					imgui.PushFont(utils.FontRobotoBold)
 					imgui.Text("Output")
@@ -170,35 +156,7 @@ func RenderSoftware() {
 					imgui.EndChild()
 					imgui.EndGroup()
 
-					//imgui.EndChild()
-					//imgui.LabelText("##"+softwareName+installation.Year+"licenseLabel", "Clear Data Options")
-					//imgui.BeginTableV("##"+installation.Year+"SoftwareActions", 5, imgui.TableFlagsSizingFixedFit, imgui.Vec2{X: -1, Y: 30}, -1)
-					//imgui.TableNextRow()
-					//imgui.TableNextColumn()
-					//if imgui.Button(" Resource Manager Cache " + "##" + installation.Year + "RMC") {
-					//	//software.ClearInstalledSoftware(installation)
-					//	//err := software.GenerateInstalledSoftwareMap()
-					//	//if err != nil {
-					//	//	fmt.Errorf("error updating internal installation data after serial update %v", err)
-					//	//}
-					//}
-					//imgui.EndTable()
-
-					////imgui.Dummy(imgui.Vec2{X: -1, Y: 5})
-					//imgui.BeginChildV("##softwareContentChild", imgui.ContentRegionAvail(), true, 0)
-					//
-					////////////
-					//// Edit Serial
-					////////////
-					//imgui.Text("Edit Serial")
-					//
-					////////////
-					//// Clear User Data
-					////////////
-					//
-					//imgui.EndChild()
-					// ----------------------------
-					// Ending the active software version tab content
+					// End TABS
 					imgui.EndTabItem()
 				}
 			}
