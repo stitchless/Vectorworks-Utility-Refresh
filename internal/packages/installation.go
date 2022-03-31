@@ -2,7 +2,7 @@ package packages
 
 type Installation struct {
 	ID int
-	ModuleName
+	SoftwareModule
 	Year         string
 	License      License
 	Properties   []string

@@ -10,7 +10,7 @@ import (
 
 // TODO: Replace all home directories with GetConfigDirectory
 
-func FindInstallationYears(softwareLabel ModuleName) ([]string, error) {
+func FindInstallationYears(softwareLabel SoftwareModule) ([]string, error) {
 	var years []string
 
 	files, err := os.ReadDir(app.HomeDirectory + "/Library/Preferences") // gets list of all plist file names
@@ -36,7 +36,7 @@ func FindInstallationYears(softwareLabel ModuleName) ([]string, error) {
 
 // setProperties will take in an installation and assign it's properties strings
 func (installation *Installation) setProperties() {
-	switch installation.ModuleName {
+	switch installation.SoftwareModule {
 	case ModuleVectorworks:
 		installation.Properties = []string{
 			"net.nemetschek.vectorworks.license." + installation.Year + ".plist",
@@ -60,7 +60,7 @@ func (installation *Installation) setProperties() {
 
 // setUserData well set all user data based on the target packages
 func (installation *Installation) setUserData() {
-	switch installation.ModuleName {
+	switch installation.SoftwareModule {
 	case ModuleVectorworks:
 		installation.Directories = []string{
 			app.HomeDirectory + "/Library/Application\\ Support/Vectorworks\\ RMCache/rm" + installation.Year,

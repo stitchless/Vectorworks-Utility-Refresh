@@ -16,7 +16,7 @@ type LicenseOpts struct {
 }
 
 func GetSerialLocation(installation Installation) string {
-	switch installation.ModuleName {
+	switch installation.SoftwareModule {
 	case ModuleVectorworks:
 		return app.HomeDirectory + "/Library/Preferences/net.nemetschek.vectorworks.license." + installation.Year + ".plist"
 	case ModulesVision:

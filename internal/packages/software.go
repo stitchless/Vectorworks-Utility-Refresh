@@ -1,14 +1,15 @@
 package packages
 
 import (
+	"fmt"
 	"github.com/jpeizer/Vectorworks-Utility-Refresh/internal/utils"
 	"strings"
 )
 
-type ModuleName = string
+type SoftwareModule = string
 
 type Software struct {
-	Name          ModuleName
+	Name          SoftwareModule
 	Installations []Installation
 }
 
@@ -18,9 +19,9 @@ type Application struct {
 }
 
 const (
-	ModuleVectorworks    ModuleName = "Vectorworks"
-	ModulesVision        ModuleName = "Vision"
-	ModulesCloudServices ModuleName = "VCS"
+	ModuleVectorworks    SoftwareModule = "Vectorworks"
+	ModulesVision        SoftwareModule = "Vision"
+	ModulesCloudServices SoftwareModule = "VCS"
 )
 
 var (
@@ -52,9 +53,9 @@ func (s *Software) Refresh() {
 
 	for i, year := range years {
 		installation := Installation{
-			ID:         i,
-			Year:       year,
-			ModuleName: s.Name,
+			ID:             i,
+			Year:           year,
+			SoftwareModule: s.Name,
 		}
 
 		serial, err := getSerial(installation)
@@ -89,6 +90,10 @@ func GetApplication() *Application {
 
 	for _, software := range AllSoftware {
 		software.Refresh()
+		if len(software.Installations) > 0 {
+			app.SoftwarePackages[software.Name] = software
+		}
 	}
+	fmt.Printf("%+v\n", app)
 	return app
 }

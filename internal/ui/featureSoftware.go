@@ -22,7 +22,6 @@ func RenderSoftware() {
 		if len(swPkg.Installations) == 0 {
 			continue
 		}
-
 		// Insert new tab for each installed supported packages
 		if imgui.BeginTabItem(swPkg.Name + "##" + swPkg.Name + "TabItem") {
 			// Begin of packages year tab bar
@@ -42,7 +41,7 @@ func RenderSoftware() {
 					if imgui.InputTextV("##EditedSerial", &installation.License.Serial, 1<<2|1<<4|1<<5, nil) {
 						err := packages.ReplaceOldSerial(installation, installation.License.Serial)
 						if err != nil {
-							fmt.Errorf("Error replacing old serial: %s", err)
+							fmt.Errorf("error replacing old serial: %s", err)
 						}
 						//err := packages.GenerateInstalledSoftwareMap()
 						//if err != nil {
@@ -71,11 +70,11 @@ func RenderSoftware() {
 						imgui.Separator()
 						imgui.Dummy(imgui.Vec2{X: 0, Y: 5})
 
-						//imgui.Checkbox("Remove resource manager cache##RMC", &installation.Options.RemoveRMC)
-						//imgui.Checkbox("Remove user data##RMUD", &installation.Options.RemoveUserData)
-						//imgui.Checkbox("Remove user settings##RMUS", &installation.Options.RemoveUserSettings)
-						//imgui.Checkbox("Remove installer files##RMIF", &installation.Options.RemoveInstallerSettings)
-						//imgui.Checkbox("Remove all user data##RMALL", &installation.Options.RemoveAllData)
+						imgui.Checkbox("Remove resource manager cache##RMC", &installation.CleanOptions.RemoveRMC)
+						imgui.Checkbox("Remove user data##RMUD", &installation.CleanOptions.RemoveUserData)
+						imgui.Checkbox("Remove user settings##RMUS", &installation.CleanOptions.RemoveUserSettings)
+						imgui.Checkbox("Remove installer files##RMIF", &installation.CleanOptions.RemoveInstallerSettings)
+						imgui.Checkbox("Remove all user data##RMALL", &installation.CleanOptions.RemoveAllData)
 
 						imgui.Dummy(imgui.Vec2{X: 0, Y: 5})
 						imgui.Separator()
@@ -88,6 +87,7 @@ func RenderSoftware() {
 							//"Remove installer files",
 							//"Remove all user data",
 							//packages.RemoveSoftware(installation)
+							fmt.Printf("Remove user data: %v\n", installation)
 							imgui.CloseCurrentPopup()
 							//err := packages.GenerateInstalledSoftwareMap()
 							//if err != nil {
