@@ -1,7 +1,8 @@
-package software
+package packages
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"regexp"
 	"strings"
@@ -9,10 +10,10 @@ import (
 
 // TODO: Replace all home directories with GetConfigDirectory
 
-func FindInstallationYears(softwareLabel SoftwareName) ([]string, error) {
+func FindInstallationYears(softwareLabel ModuleName) ([]string, error) {
 	var years []string
 
-	files, err := os.ReadDir(HomeDirectory + "/Library/Preferences") // gets list of all plist file names
+	files, err := os.ReadDir(app.HomeDirectory + "/Library/Preferences") // gets list of all plist file names
 	if err != nil {
 		return nil, errors.New("error: could not get files from local library/Preferences")
 	}
@@ -28,13 +29,15 @@ func FindInstallationYears(softwareLabel SoftwareName) ([]string, error) {
 		}
 	}
 
+	fmt.Println(years)
+
 	return years, nil
 }
 
 // setProperties will take in an installation and assign it's properties strings
 func (installation *Installation) setProperties() {
-	switch installation.SoftwareName {
-	case SoftwareVectorworks:
+	switch installation.ModuleName {
+	case ModuleVectorworks:
 		installation.Properties = []string{
 			"net.nemetschek.vectorworks.license." + installation.Year + ".plist",
 			"net.nemetschek.vectorworks." + installation.Year + ".plist",
@@ -44,7 +47,7 @@ func (installation *Installation) setProperties() {
 			"net.nemetschek.vectorworksinstaller.plist",
 			"net.vectorworks.vectorworks." + installation.Year + ".plist",
 		}
-	case SoftwareVision:
+	case ModulesVision:
 		installation.Properties = []string{
 			"com.qtproject.plist",
 			"com.vwvision.Vision" + installation.Year + ".plist",
@@ -55,20 +58,20 @@ func (installation *Installation) setProperties() {
 	}
 }
 
-// setUserData well set all user data based on the target software
+// setUserData well set all user data based on the target packages
 func (installation *Installation) setUserData() {
-	switch installation.SoftwareName {
-	case SoftwareVectorworks:
+	switch installation.ModuleName {
+	case ModuleVectorworks:
 		installation.Directories = []string{
-			HomeDirectory + "/Library/Application\\ Support/Vectorworks\\ RMCache/rm" + installation.Year,
-			HomeDirectory + "/Library/Application\\ Support/Vectorworks\\ Cloud\\ Services",
-			HomeDirectory + "/Library/Application\\ Support/Vectorworks/" + installation.Year,
-			HomeDirectory + "/Library/Application\\ Support/vectorworks-installer-wrapper",
+			app.HomeDirectory + "/Library/Application\\ Support/Vectorworks\\ RMCache/rm" + installation.Year,
+			app.HomeDirectory + "/Library/Application\\ Support/Vectorworks\\ Cloud\\ Services",
+			app.HomeDirectory + "/Library/Application\\ Support/Vectorworks/" + installation.Year,
+			app.HomeDirectory + "/Library/Application\\ Support/vectorworks-installer-wrapper",
 		}
-	case SoftwareVision:
+	case ModulesVision:
 		installation.Directories = []string{
-			HomeDirectory + "/Library/Application\\ Support/Vision/" + installation.Year,
-			HomeDirectory + "/Library/Application\\ Support/VisionUpdater",
+			app.HomeDirectory + "/Library/Application\\ Support/Vision/" + installation.Year,
+			app.HomeDirectory + "/Library/Application\\ Support/VisionUpdater",
 			"/Library/Frameworks/QtConcurrent.framework",
 			"/Library/Frameworks/QtCore.framework",
 			"/Library/Frameworks/QtDBus.framework",
@@ -94,22 +97,22 @@ func (installation *Installation) setUserData() {
 
 // setRMCache sets the system path for the resource manager cache directory
 func (installation *Installation) setRMCache() {
-	installation.RMCache = HomeDirectory + "/Library/Application\\ Support/Vectorworks\\ RMCache/rm" + installation.Year
+	installation.RMCache = app.HomeDirectory + "/Library/Application\\ Support/Vectorworks\\ RMCache/rm" + installation.Year
 }
 
-// setLogFiles sets all the log files paths for the target software
+// setLogFiles sets all the log files paths for the target packages
 func (installation *Installation) setLogFileSent() {
-	installation.LogFileSent = HomeDirectory + "/Library/Application\\ Support/Vectorworks/" + installation.Year + "/VW User Log Sent.txt"
+	installation.LogFileSent = app.HomeDirectory + "/Library/Application\\ Support/Vectorworks/" + installation.Year + "/VW User Log Sent.txt"
 }
 
-// setLogFiles sets all the log files paths for the target software
+// setLogFiles sets all the log files paths for the target packages
 func (installation *Installation) setLogFile() {
-	installation.LogFile = HomeDirectory + "/Library/Application\\ Support/Vectorworks/" + installation.Year + "/VW User Log.txt"
+	installation.LogFile = app.HomeDirectory + "/Library/Application\\ Support/Vectorworks/" + installation.Year + "/VW User Log.txt"
 }
 
 func (installation Installation) Clean() {
-	plistPath := HomeDirectory + "/Library/Preferences/"
-	// Deletes relevant plist files for select software/version
+	plistPath := app.HomeDirectory + "/Library/Preferences/"
+	// Deletes relevant plist files for select packages/version
 	for _, plist := range installation.Properties {
 		err := os.RemoveAll(plistPath + plist)
 		if err != nil {

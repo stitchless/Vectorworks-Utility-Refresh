@@ -147,6 +147,6 @@ func Run(p Platform, r Renderer) {
 		p.PostRender()
 
 		// sleep to avoid 100% CPU usage for this demo
-		//<-time.After(sleepDuration)
+		<-time.After(sleepDuration)
 	}
 }

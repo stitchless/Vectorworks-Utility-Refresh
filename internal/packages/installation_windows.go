@@ -1,4 +1,4 @@
-package software
+package packages
 
 import (
 	"errors"
@@ -11,15 +11,15 @@ import (
 )
 
 // TODO: Replace all home directories with GetConfigDirectory
-func FindInstallationYears(softwareName SoftwareName) ([]string, error) {
+func FindInstallationYears(softwareName ModuleName) ([]string, error) {
 	var appdataFolder string
 	var years []string
 
-	// Different software has different locations
+	// Different packages has different locations
 	switch softwareName {
-	case SoftwareVectorworks:
+	case ModuleVectorworks:
 		appdataFolder = os.Getenv("APPDATA") + "/Nemetschek/Vectorworks"
-	case SoftwareVision:
+	case ModulesVision:
 		appdataFolder = os.Getenv("APPDATA") + "/Vision"
 	default:
 		return nil, errors.New("info: APPDATA not found for provided paths")
@@ -44,13 +44,13 @@ func FindInstallationYears(softwareName SoftwareName) ([]string, error) {
 func (installation *Installation) setProperties() {
 	version := convertYearToVersion(installation.Year)
 
-	switch installation.SoftwareName {
-	case SoftwareVectorworks:
+	switch installation.ModuleName {
+	case ModuleVectorworks:
 		installation.Properties = []string{
 			"SOFTWARE\\Nemetschek\\Vectorworks " + version,
 			"SOFTWARE\\VectorWorks",
 		}
-	case SoftwareVision:
+	case ModulesVision:
 		installation.Properties = []string{
 			"ESP Vision",
 			"SOFTWARE\\VectorWorks\\Vision " + installation.Year,
@@ -59,33 +59,33 @@ func (installation *Installation) setProperties() {
 	}
 }
 
-// setUserData well set all user data based on the target software
+// setUserData well set all user data based on the target packages
 func (installation *Installation) setUserData() {
 	winAppData := os.Getenv("APPDATA") + "\\"
 	winLocalAppData := os.Getenv("LOCALAPPDATA") + "\\"
 
-	// Set Directories based on software found
-	switch installation.SoftwareName {
-	case SoftwareVectorworks:
+	// Set Directories based on packages found
+	switch installation.ModuleName {
+	case ModuleVectorworks:
 		installation.Directories = []string{
-			winAppData + installation.SoftwareName + "\\" + installation.Year,
-			winAppData + installation.SoftwareName + " " + installation.Year + " Installer",
-			winAppData + installation.SoftwareName + " " + installation.Year + " Updater",
-			winAppData + "Nemetschek\\" + installation.SoftwareName + "\\" + installation.Year,
-			winAppData + "Nemetschek\\" + installation.SoftwareName + "\\accounts",
-			winAppData + "Nemetschek\\" + installation.SoftwareName + " Web Cache",
+			winAppData + installation.ModuleName + "\\" + installation.Year,
+			winAppData + installation.ModuleName + " " + installation.Year + " Installer",
+			winAppData + installation.ModuleName + " " + installation.Year + " Updater",
+			winAppData + "Nemetschek\\" + installation.ModuleName + "\\" + installation.Year,
+			winAppData + "Nemetschek\\" + installation.ModuleName + "\\accounts",
+			winAppData + "Nemetschek\\" + installation.ModuleName + " Web Cache",
 			winAppData + "vectorworks-installer",
 			winAppData + "vectorworks-updater",
 			winAppData + "vectorworks-updater-updater",
 			winLocalAppData + "vectorworks-updater-updater",
 			winLocalAppData + "Nemetschek",
 		}
-	case SoftwareVision:
+	case ModulesVision:
 		installation.Directories = []string{
-			filepath.Join(winAppData, installation.SoftwareName, installation.Year),
+			filepath.Join(winAppData, installation.ModuleName, installation.Year),
 			filepath.Join(winLocalAppData, "VisionUpdater"),
 		}
-	case SoftwareCloudServices:
+	case ModulesCloudServices:
 		installation.Directories = []string{
 			winAppData + "vectorworks-cloud-services-beta",
 			winAppData + "vectorworks-cloud-services",
@@ -97,22 +97,22 @@ func (installation *Installation) setUserData() {
 // setRMCache sets the system path for the resource manager cache directory
 func (installation *Installation) setRMCache() {
 	winAppData := os.Getenv("APPDATA") + "\\"
-	installation.RMCache = winAppData + "Nemetschek\\" + installation.SoftwareName + " RMCache\\rm" + installation.Year
+	installation.RMCache = winAppData + "Nemetschek\\" + installation.ModuleName + " RMCache\\rm" + installation.Year
 }
 
-// setLogFiles sets all the log files paths for the target software
+// setLogFiles sets all the log files paths for the target packages
 func (installation *Installation) setLogFileSent() {
 	winAppData := os.Getenv("APPDATA") + "\\"
-	installation.LogFileSent = filepath.Join(winAppData, "Nemetschek", installation.SoftwareName, installation.Year, "VW User Log Sent.txt")
+	installation.LogFileSent = filepath.Join(winAppData, "Nemetschek", installation.ModuleName, installation.Year, "VW User Log Sent.txt")
 }
 
-// setLogFiles sets all the log files paths for the target software
+// setLogFiles sets all the log files paths for the target packages
 func (installation *Installation) setLogFile() {
 	winAppData := os.Getenv("APPDATA") + "\\"
-	installation.LogFile = filepath.Join(winAppData, "Nemetschek", installation.SoftwareName, installation.Year, "VW User Log.txt")
+	installation.LogFile = filepath.Join(winAppData, "Nemetschek", installation.ModuleName, installation.Year, "VW User Log.txt")
 }
 
-// Clean removes the registry entry for the target software
+// Clean removes the registry entry for the target packages
 func (installation Installation) Clean() {
 	fmt.Println("Hello")
 	for _, property := range installation.Properties {

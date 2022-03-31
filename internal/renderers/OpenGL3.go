@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/inkyblackness/imgui-go/v4"
-	"github.com/jpeizer/Vectorworks-Utility-Refresh/internal/renderers/gl/v3.2-core/gl"
+	"github.com/jpeizer/Vectorworks-Utility-Refresh/internal/renderers/gl/v3.3-core/gl"
 )
 
 //go:embed gl-shader/main.vert

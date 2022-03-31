@@ -1,4 +1,4 @@
-package software
+package packages
 
 import (
 	"bufio"
@@ -16,11 +16,11 @@ type LicenseOpts struct {
 }
 
 func GetSerialLocation(installation Installation) string {
-	switch installation.SoftwareName {
-	case SoftwareVectorworks:
-		return HomeDirectory + "/Library/Preferences/net.nemetschek.vectorworks.license." + installation.Year + ".plist"
-	case SoftwareVision:
-		return HomeDirectory + "/Library/Preferences/net.vectorworks.vision.license." + installation.Year + ".plist"
+	switch installation.ModuleName {
+	case ModuleVectorworks:
+		return app.HomeDirectory + "/Library/Preferences/net.nemetschek.vectorworks.license." + installation.Year + ".plist"
+	case ModulesVision:
+		return app.HomeDirectory + "/Library/Preferences/net.vectorworks.vision.license." + installation.Year + ".plist"
 	}
 
 	return ""
@@ -51,12 +51,12 @@ func getSerial(installation Installation) (string, error) {
 
 func ReplaceOldSerial(installation Installation, newSerial string) error {
 	licenseLocation := GetSerialLocation(installation)
-	plistFile, err := os.Open(licenseLocation);
+	plistFile, err := os.Open(licenseLocation)
 	if err != nil {
 		return err
 	}
 
-	err = plistFile.Truncate(0);
+	err = plistFile.Truncate(0)
 	if err != nil {
 		return err
 	}
@@ -89,12 +89,12 @@ func ReplaceOldSerial(installation Installation, newSerial string) error {
 
 	fmt.Printf("wrote %d bytes\n", n4)
 
-	err = w.Flush();
+	err = w.Flush()
 	if err != nil {
 		return err
 	}
 
-	err = refreshPList();
+	err = refreshPList()
 	if err != nil {
 		return err
 	}
@@ -106,7 +106,7 @@ func refreshPList() error {
 	fmt.Println("Refreshing plist files...")
 	// osascript -e 'do shell script "sudo killall -u $USER cfprefsd" with administrator privileges'
 	cmd := exec.Command(`osascript`, "-s", "h", "-e", `do shell script "sudo killall -u $USER cfprefsd" with administrator privileges`)
-	stderr, err := cmd.StderrPipe();
+	stderr, err := cmd.StderrPipe()
 	if err != nil {
 		return err
 	}

@@ -1,4 +1,4 @@
-package software
+package packages
 
 import (
 	"golang.org/x/sys/windows/registry"
@@ -17,11 +17,11 @@ func getSerial(installation Installation) string {
 		_ = key.Close()
 	}()
 
-	switch installation.SoftwareName {
-	case SoftwareVectorworks:
+	switch installation.ModuleName {
+	case ModuleVectorworks:
 		serial, _, _ := key.GetStringValue("User Serial Number")
 		return serial
-	case SoftwareVision:
+	case ModulesVision:
 		serial, _, _ := key.GetStringValue("")
 		return serial
 	}
@@ -47,10 +47,10 @@ func convertYearToVersion(appYear string) string {
 func getSerialLocation(installation Installation) string {
 	version := convertYearToVersion(installation.Year)
 
-	switch installation.SoftwareName {
-	case SoftwareVectorworks:
+	switch installation.ModuleName {
+	case ModuleVectorworks:
 		return "SOFTWARE\\Nemetschek\\Vectorworks " + version + "\\Registration"
-	case SoftwareVision:
+	case ModulesVision:
 		return "SOFTWARE\\VectorWorks\\Vision " + installation.Year + "\\Registration"
 	}
 

@@ -8,7 +8,7 @@ import (
 	"math"
 	"runtime"
 
-	"github.com/go-gl/glfw/v3.2/glfw"
+	"github.com/go-gl/glfw/v3.3/glfw"
 	"github.com/inkyblackness/imgui-go/v4"
 )
 
@@ -210,7 +210,7 @@ func (platform *GLFW) charChange(window *glfw.Window, char rune) {
 
 // ClipboardText returns the current clipboard text, if available.
 func (platform *GLFW) ClipboardText() (string, error) {
-	return platform.window.GetClipboardString()
+	return platform.window.GetClipboardString(), nil
 }
 
 // SetClipboardText sets the text as the current clipboard text.

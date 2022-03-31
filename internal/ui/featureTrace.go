@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/inkyblackness/imgui-go/v4"
-	"github.com/jpeizer/Vectorworks-Utility-Refresh/internal/software"
 	"github.com/jpeizer/Vectorworks-Utility-Refresh/internal/utils"
 	"github.com/sqweek/dialog"
 	"log"
@@ -137,18 +136,18 @@ func traceApplication(targetFile string) {
 // to timing issues where the logs can be sent before the loop is run again.
 // https://github.com/radovskyb/watcher
 // https://github.com/fsnotify/fsnotify
-// showLogs currently shows all logs once for all software found (Vectorworks, and Vision)
+// showLogs currently shows all logs once for all packages found (Vectorworks, and Vision)
 func showLogs() {
 	if !readLogs {
 		readLogs = true
-		for _, softwareName := range software.AllActiveSoftwareNames {
+		for _, swPkg := range application.SoftwarePackages {
 			// Data Structure:::Log File
 
-			// Test for installations of active software prior to making a table
-			if len(software.AllInstalledSoftwareMap[softwareName]) == 0 {
+			// Test for installations of active packages prior to making a table
+			if len(swPkg.Installations) == 0 {
 				return
 			}
-			for _, installation := range software.AllInstalledSoftwareMap[softwareName] {
+			for _, installation := range swPkg.Installations {
 				file, err := os.Open(installation.LogFile)
 				if err != nil {
 					errors.New("error: could not open log file" + installation.LogFile)

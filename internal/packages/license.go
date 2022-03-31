@@ -1,6 +1,9 @@
-package software
+package packages
 
-import "regexp"
+import (
+	"regexp"
+	"strings"
+)
 
 // License provides a parsed breakdown of a serial number, including the serial itself
 type License struct {
@@ -60,4 +63,37 @@ func cleanSerial(serial string) string {
 		return parseSerial[0]
 	}
 	panic("ERROR: REPLACE THIS WITH A TOAST SHOWING INVALID INPUT!")
+}
+
+func getActivation(serial []string) string {
+	out, OK := licenseActivationMap[serial[0]]
+	if OK {
+		return out
+	}
+	return "Activation not found"
+}
+
+func getPlatform(serial []string) string {
+	out, OK := licensePlatformMap[serial[2]]
+	if OK {
+		return out
+	}
+	return "Platform not found"
+}
+
+func getLocal(serial []string) string {
+	local := strings.Join(serial[3:5], "")
+	out, OK := licenseLocalMap[local]
+	if OK {
+		return out
+	}
+	return "Local not found"
+}
+
+func getType(serial []string) string {
+	out, OK := licenseTypeMap[serial[5]]
+	if OK {
+		return out
+	}
+	return "License type not found"
 }

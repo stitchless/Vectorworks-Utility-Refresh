@@ -3,7 +3,7 @@ package ui
 import (
 	"fmt"
 	"github.com/inkyblackness/imgui-go/v4"
-	"github.com/jpeizer/Vectorworks-Utility-Refresh/internal/software"
+	"github.com/jpeizer/Vectorworks-Utility-Refresh/internal/packages"
 	"github.com/jpeizer/Vectorworks-Utility-Refresh/internal/utils"
 )
 
@@ -11,26 +11,26 @@ var (
 	toggleSerialDetails bool
 )
 
-// RenderSoftware shows serials of found supported software
+// RenderSoftware shows serials of found supported packages
 func RenderSoftware() {
 	var item int32 = 0
-
-	// Start of software tab bar
+	// Start of packages tab bar
 	imgui.BeginTabBar("##SoftwareTabBar")
-	// Run for all active supported software
-	for _, softwareName := range software.AllActiveSoftwareNames {
-		// Test for installations of active software prior to making a table
-		if len(software.AllInstalledSoftwareMap[softwareName]) == 0 {
+	// Run for all active supported packages
+	for _, swPkg := range application.SoftwarePackages {
+		// Test for installations of active packages prior to making a table
+		if len(swPkg.Installations) == 0 {
 			continue
 		}
-		// Insert new tab for each installed supported software
-		if imgui.BeginTabItem(softwareName + "##" + softwareName + "TabItem") {
-			// Begin of software year tab bar
-			imgui.BeginTabBar("##" + softwareName + "TabBar")
-			// Find all installed software versions
-			for _, installation := range software.AllInstalledSoftwareMap[softwareName] {
-				// Insert a new tab for all software versions found
-				if imgui.BeginTabItem(installation.Year + "##" + softwareName + installation.Year + "TabItem") {
+
+		// Insert new tab for each installed supported packages
+		if imgui.BeginTabItem(swPkg.Name + "##" + swPkg.Name + "TabItem") {
+			// Begin of packages year tab bar
+			imgui.BeginTabBar("##" + swPkg.Name + "TabBar")
+			// Find all installed packages versions
+			for _, installation := range swPkg.Installations {
+				// Insert a new tab for all packages versions found
+				if imgui.BeginTabItem(installation.Year + "##" + swPkg.Name + installation.Year + "TabItem") {
 					// ----------------------------
 					// LAYOUT FOR SOFTWARE FEATURES
 					// ----------------------------
@@ -40,11 +40,14 @@ func RenderSoftware() {
 					imgui.PushItemWidth(350)
 					// Flags 2 InputTextFlagsCharsUppercase | 4 InputTextFlagsAutoSelectAll | InputTextFlagsEnterReturnsTrue
 					if imgui.InputTextV("##EditedSerial", &installation.License.Serial, 1<<2|1<<4|1<<5, nil) {
-						software.ReplaceOldSerial(installation, installation.License.Serial)
-						err := software.GenerateInstalledSoftwareMap()
+						err := packages.ReplaceOldSerial(installation, installation.License.Serial)
 						if err != nil {
-							fmt.Errorf("error updating internal installation data after serial update %v", err)
+							fmt.Errorf("Error replacing old serial: %s", err)
 						}
+						//err := packages.GenerateInstalledSoftwareMap()
+						//if err != nil {
+						//	fmt.Errorf("error updating internal installation data after serial update %v", err)
+						//}
 					}
 					imgui.PopItemWidth()
 					//imgui.PopFont()
@@ -63,16 +66,16 @@ func RenderSoftware() {
 
 					// License Cleanup Button
 					if imgui.BeginPopupModalV("Clean Software", nil, imgui.WindowFlagsAlwaysAutoResize) {
-						imgui.Text("Select the options below to clean the software.")
+						imgui.Text("Select the options below to clean the packages.")
 
 						imgui.Separator()
 						imgui.Dummy(imgui.Vec2{X: 0, Y: 5})
 
-						imgui.Checkbox("Remove resource manager cache##RMC", &installation.Options.RemoveRMC)
-						imgui.Checkbox("Remove user data##RMUD", &installation.Options.RemoveUserData)
-						imgui.Checkbox("Remove user settings##RMUS", &installation.Options.RemoveUserSettings)
-						imgui.Checkbox("Remove installer files##RMIF", &installation.Options.RemoveInstallerSettings)
-						imgui.Checkbox("Remove all user data##RMALL", &installation.Options.RemoveAllData)
+						//imgui.Checkbox("Remove resource manager cache##RMC", &installation.Options.RemoveRMC)
+						//imgui.Checkbox("Remove user data##RMUD", &installation.Options.RemoveUserData)
+						//imgui.Checkbox("Remove user settings##RMUS", &installation.Options.RemoveUserSettings)
+						//imgui.Checkbox("Remove installer files##RMIF", &installation.Options.RemoveInstallerSettings)
+						//imgui.Checkbox("Remove all user data##RMALL", &installation.Options.RemoveAllData)
 
 						imgui.Dummy(imgui.Vec2{X: 0, Y: 5})
 						imgui.Separator()
@@ -84,12 +87,12 @@ func RenderSoftware() {
 							//"Remove user settings",
 							//"Remove installer files",
 							//"Remove all user data",
-							//software.RemoveSoftware(installation)
+							//packages.RemoveSoftware(installation)
 							imgui.CloseCurrentPopup()
-							err := software.GenerateInstalledSoftwareMap()
-							if err != nil {
-								fmt.Errorf("error updating internal installation data after serial update %v", err)
-							}
+							//err := packages.GenerateInstalledSoftwareMap()
+							//if err != nil {
+							//	fmt.Errorf("error updating internal installation data after serial update %v", err)
+							//}
 						}
 						imgui.SameLine()
 						if imgui.Button("Cancel") {
@@ -103,7 +106,7 @@ func RenderSoftware() {
 						imgui.OpenPopup("Clean Software")
 					}
 					if imgui.IsItemHovered() {
-						imgui.SetTooltip("Clean up this installation of software")
+						imgui.SetTooltip("Clean up this installation of packages")
 					}
 
 					imgui.PopFont()
@@ -160,12 +163,12 @@ func RenderSoftware() {
 					imgui.EndTabItem()
 				}
 			}
-			// Ending the software version tab bar
+			// Ending the packages version tab bar
 			imgui.EndTabBar()
-			// Ending the software name tab content
+			// Ending the packages name tab content
 			imgui.EndTabItem()
 		}
 	}
-	// Ending the software name tab bar
+	// Ending the packages name tab bar
 	imgui.EndTabBar()
 }

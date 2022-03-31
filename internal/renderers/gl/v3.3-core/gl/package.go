@@ -6,7 +6,7 @@
 // http://opencontent.org/openpub/.
 //
 // Copyright (c) 1991-2006 Silicon Graphics, Inc.
-// This document is licensed under the SGI Free packages B License.
+// This document is licensed under the SGI Free Software B License.
 // For details, see http://oss.sgi.com/projects/FreeB.
 
 // Package gl implements Go bindings to OpenGL.
@@ -65,9 +65,9 @@ package gl
 // typedef void (APIENTRY *GLDEBUGPROCARB)(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar *message,const void *userParam);
 // typedef void (APIENTRY *GLDEBUGPROCKHR)(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar *message,const void *userParam);
 // typedef void (APIENTRY *GLVULKANPROCNV)(void);
-// extern void glowDebugCallback_glcore32(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
+// extern void glowDebugCallback_glcore33(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
 // static void APIENTRY glowCDebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
-//   glowDebugCallback_glcore32(source, type, id, severity, length, message, userParam);
+//   glowDebugCallback_glcore33(source, type, id, severity, length, message, userParam);
 // }
 // typedef void  (APIENTRYP GPACTIVEPROGRAMEXT)(GLuint  program);
 // typedef void  (APIENTRYP GPACTIVESHADERPROGRAM)(GLuint  pipeline, GLuint  program);
@@ -1286,6 +1286,7 @@ package gl
 // typedef void  (APIENTRYP GPVERTEXATTRIB4UIV)(GLuint  index, const GLuint * v);
 // typedef void  (APIENTRYP GPVERTEXATTRIB4USV)(GLuint  index, const GLushort * v);
 // typedef void  (APIENTRYP GPVERTEXATTRIBBINDING)(GLuint  attribindex, GLuint  bindingindex);
+// typedef void  (APIENTRYP GPVERTEXATTRIBDIVISOR)(GLuint  index, GLuint  divisor);
 // typedef void  (APIENTRYP GPVERTEXATTRIBDIVISORARB)(GLuint  index, GLuint  divisor);
 // typedef void  (APIENTRYP GPVERTEXATTRIBFORMAT)(GLuint  attribindex, GLint  size, GLenum  type, GLboolean  normalized, GLuint  relativeoffset);
 // typedef void  (APIENTRYP GPVERTEXATTRIBFORMATNV)(GLuint  index, GLint  size, GLenum  type, GLboolean  normalized, GLsizei  stride);
@@ -5022,6 +5023,9 @@ package gl
 // static void  glowVertexAttribBinding(GPVERTEXATTRIBBINDING fnptr, GLuint  attribindex, GLuint  bindingindex) {
 //   (*fnptr)(attribindex, bindingindex);
 // }
+// static void  glowVertexAttribDivisor(GPVERTEXATTRIBDIVISOR fnptr, GLuint  index, GLuint  divisor) {
+//   (*fnptr)(index, divisor);
+// }
 // static void  glowVertexAttribDivisorARB(GPVERTEXATTRIBDIVISORARB fnptr, GLuint  index, GLuint  divisor) {
 //   (*fnptr)(index, divisor);
 // }
@@ -7302,6 +7306,7 @@ const (
 	VERTEX_ATTRIB_ARRAY_ADDRESS_NV                             = 0x8F20
 	VERTEX_ATTRIB_ARRAY_BARRIER_BIT                            = 0x00000001
 	VERTEX_ATTRIB_ARRAY_BUFFER_BINDING                         = 0x889F
+	VERTEX_ATTRIB_ARRAY_DIVISOR                                = 0x88FE
 	VERTEX_ATTRIB_ARRAY_DIVISOR_ARB                            = 0x88FE
 	VERTEX_ATTRIB_ARRAY_ENABLED                                = 0x8622
 	VERTEX_ATTRIB_ARRAY_INTEGER                                = 0x88FD
@@ -8620,6 +8625,7 @@ var (
 	gpVertexAttrib4uiv                               C.GPVERTEXATTRIB4UIV
 	gpVertexAttrib4usv                               C.GPVERTEXATTRIB4USV
 	gpVertexAttribBinding                            C.GPVERTEXATTRIBBINDING
+	gpVertexAttribDivisor                            C.GPVERTEXATTRIBDIVISOR
 	gpVertexAttribDivisorARB                         C.GPVERTEXATTRIBDIVISORARB
 	gpVertexAttribFormat                             C.GPVERTEXATTRIBFORMAT
 	gpVertexAttribFormatNV                           C.GPVERTEXATTRIBFORMATNV
@@ -10172,7 +10178,7 @@ func GetFramebufferParameterivMESA(target uint32, pname uint32, params *int32) {
 	C.glowGetFramebufferParameterivMESA(gpGetFramebufferParameterivMESA, (C.GLenum)(target), (C.GLenum)(pname), (*C.GLint)(unsafe.Pointer(params)))
 }
 
-// check if the rendering context has not been lost due to packages or hardware issues
+// check if the rendering context has not been lost due to software or hardware issues
 func GetGraphicsResetStatus() uint32 {
 	ret := C.glowGetGraphicsResetStatus(gpGetGraphicsResetStatus)
 	return (uint32)(ret)
@@ -13301,6 +13307,11 @@ func VertexAttrib4usv(index uint32, v *uint16) {
 func VertexAttribBinding(attribindex uint32, bindingindex uint32) {
 	C.glowVertexAttribBinding(gpVertexAttribBinding, (C.GLuint)(attribindex), (C.GLuint)(bindingindex))
 }
+
+// modify the rate at which generic vertex attributes advance during instanced rendering
+func VertexAttribDivisor(index uint32, divisor uint32) {
+	C.glowVertexAttribDivisor(gpVertexAttribDivisor, (C.GLuint)(index), (C.GLuint)(divisor))
+}
 func VertexAttribDivisorARB(index uint32, divisor uint32) {
 	C.glowVertexAttribDivisorARB(gpVertexAttribDivisorARB, (C.GLuint)(index), (C.GLuint)(divisor))
 }
@@ -13627,6 +13638,9 @@ func InitWithProcAddrFunc(getProcAddr func(name string) unsafe.Pointer) error {
 		return errors.New("glBindFragDataLocation")
 	}
 	gpBindFragDataLocationIndexed = (C.GPBINDFRAGDATALOCATIONINDEXED)(getProcAddr("glBindFragDataLocationIndexed"))
+	if gpBindFragDataLocationIndexed == nil {
+		return errors.New("glBindFragDataLocationIndexed")
+	}
 	gpBindFramebuffer = (C.GPBINDFRAMEBUFFER)(getProcAddr("glBindFramebuffer"))
 	if gpBindFramebuffer == nil {
 		return errors.New("glBindFramebuffer")
@@ -13641,6 +13655,9 @@ func InitWithProcAddrFunc(getProcAddr func(name string) unsafe.Pointer) error {
 		return errors.New("glBindRenderbuffer")
 	}
 	gpBindSampler = (C.GPBINDSAMPLER)(getProcAddr("glBindSampler"))
+	if gpBindSampler == nil {
+		return errors.New("glBindSampler")
+	}
 	gpBindSamplers = (C.GPBINDSAMPLERS)(getProcAddr("glBindSamplers"))
 	gpBindShadingRateImageNV = (C.GPBINDSHADINGRATEIMAGENV)(getProcAddr("glBindShadingRateImageNV"))
 	gpBindTexture = (C.GPBINDTEXTURE)(getProcAddr("glBindTexture"))
@@ -13932,6 +13949,9 @@ func InitWithProcAddrFunc(getProcAddr func(name string) unsafe.Pointer) error {
 		return errors.New("glDeleteRenderbuffers")
 	}
 	gpDeleteSamplers = (C.GPDELETESAMPLERS)(getProcAddr("glDeleteSamplers"))
+	if gpDeleteSamplers == nil {
+		return errors.New("glDeleteSamplers")
+	}
 	gpDeleteShader = (C.GPDELETESHADER)(getProcAddr("glDeleteShader"))
 	if gpDeleteShader == nil {
 		return errors.New("glDeleteShader")
@@ -14173,6 +14193,9 @@ func InitWithProcAddrFunc(getProcAddr func(name string) unsafe.Pointer) error {
 		return errors.New("glGenRenderbuffers")
 	}
 	gpGenSamplers = (C.GPGENSAMPLERS)(getProcAddr("glGenSamplers"))
+	if gpGenSamplers == nil {
+		return errors.New("glGenSamplers")
+	}
 	gpGenTextures = (C.GPGENTEXTURES)(getProcAddr("glGenTextures"))
 	if gpGenTextures == nil {
 		return errors.New("glGenTextures")
@@ -14284,6 +14307,9 @@ func InitWithProcAddrFunc(getProcAddr func(name string) unsafe.Pointer) error {
 		return errors.New("glGetFloatv")
 	}
 	gpGetFragDataIndex = (C.GPGETFRAGDATAINDEX)(getProcAddr("glGetFragDataIndex"))
+	if gpGetFragDataIndex == nil {
+		return errors.New("glGetFragDataIndex")
+	}
 	gpGetFragDataLocation = (C.GPGETFRAGDATALOCATION)(getProcAddr("glGetFragDataLocation"))
 	if gpGetFragDataLocation == nil {
 		return errors.New("glGetFragDataLocation")
@@ -14417,11 +14443,17 @@ func InitWithProcAddrFunc(getProcAddr func(name string) unsafe.Pointer) error {
 	gpGetQueryBufferObjectuiv = (C.GPGETQUERYBUFFEROBJECTUIV)(getProcAddr("glGetQueryBufferObjectuiv"))
 	gpGetQueryIndexediv = (C.GPGETQUERYINDEXEDIV)(getProcAddr("glGetQueryIndexediv"))
 	gpGetQueryObjecti64v = (C.GPGETQUERYOBJECTI64V)(getProcAddr("glGetQueryObjecti64v"))
+	if gpGetQueryObjecti64v == nil {
+		return errors.New("glGetQueryObjecti64v")
+	}
 	gpGetQueryObjectiv = (C.GPGETQUERYOBJECTIV)(getProcAddr("glGetQueryObjectiv"))
 	if gpGetQueryObjectiv == nil {
 		return errors.New("glGetQueryObjectiv")
 	}
 	gpGetQueryObjectui64v = (C.GPGETQUERYOBJECTUI64V)(getProcAddr("glGetQueryObjectui64v"))
+	if gpGetQueryObjectui64v == nil {
+		return errors.New("glGetQueryObjectui64v")
+	}
 	gpGetQueryObjectuiv = (C.GPGETQUERYOBJECTUIV)(getProcAddr("glGetQueryObjectuiv"))
 	if gpGetQueryObjectuiv == nil {
 		return errors.New("glGetQueryObjectuiv")
@@ -14435,9 +14467,21 @@ func InitWithProcAddrFunc(getProcAddr func(name string) unsafe.Pointer) error {
 		return errors.New("glGetRenderbufferParameteriv")
 	}
 	gpGetSamplerParameterIiv = (C.GPGETSAMPLERPARAMETERIIV)(getProcAddr("glGetSamplerParameterIiv"))
+	if gpGetSamplerParameterIiv == nil {
+		return errors.New("glGetSamplerParameterIiv")
+	}
 	gpGetSamplerParameterIuiv = (C.GPGETSAMPLERPARAMETERIUIV)(getProcAddr("glGetSamplerParameterIuiv"))
+	if gpGetSamplerParameterIuiv == nil {
+		return errors.New("glGetSamplerParameterIuiv")
+	}
 	gpGetSamplerParameterfv = (C.GPGETSAMPLERPARAMETERFV)(getProcAddr("glGetSamplerParameterfv"))
+	if gpGetSamplerParameterfv == nil {
+		return errors.New("glGetSamplerParameterfv")
+	}
 	gpGetSamplerParameteriv = (C.GPGETSAMPLERPARAMETERIV)(getProcAddr("glGetSamplerParameteriv"))
+	if gpGetSamplerParameteriv == nil {
+		return errors.New("glGetSamplerParameteriv")
+	}
 	gpGetShaderInfoLog = (C.GPGETSHADERINFOLOG)(getProcAddr("glGetShaderInfoLog"))
 	if gpGetShaderInfoLog == nil {
 		return errors.New("glGetShaderInfoLog")
@@ -14658,6 +14702,9 @@ func InitWithProcAddrFunc(getProcAddr func(name string) unsafe.Pointer) error {
 		return errors.New("glIsRenderbuffer")
 	}
 	gpIsSampler = (C.GPISSAMPLER)(getProcAddr("glIsSampler"))
+	if gpIsSampler == nil {
+		return errors.New("glIsSampler")
+	}
 	gpIsShader = (C.GPISSHADER)(getProcAddr("glIsShader"))
 	if gpIsShader == nil {
 		return errors.New("glIsShader")
@@ -15065,6 +15112,9 @@ func InitWithProcAddrFunc(getProcAddr func(name string) unsafe.Pointer) error {
 	gpPushDebugGroupKHR = (C.GPPUSHDEBUGGROUPKHR)(getProcAddr("glPushDebugGroupKHR"))
 	gpPushGroupMarkerEXT = (C.GPPUSHGROUPMARKEREXT)(getProcAddr("glPushGroupMarkerEXT"))
 	gpQueryCounter = (C.GPQUERYCOUNTER)(getProcAddr("glQueryCounter"))
+	if gpQueryCounter == nil {
+		return errors.New("glQueryCounter")
+	}
 	gpRasterSamplesEXT = (C.GPRASTERSAMPLESEXT)(getProcAddr("glRasterSamplesEXT"))
 	gpReadBuffer = (C.GPREADBUFFER)(getProcAddr("glReadBuffer"))
 	if gpReadBuffer == nil {
@@ -15100,11 +15150,29 @@ func InitWithProcAddrFunc(getProcAddr func(name string) unsafe.Pointer) error {
 		return errors.New("glSampleMaski")
 	}
 	gpSamplerParameterIiv = (C.GPSAMPLERPARAMETERIIV)(getProcAddr("glSamplerParameterIiv"))
+	if gpSamplerParameterIiv == nil {
+		return errors.New("glSamplerParameterIiv")
+	}
 	gpSamplerParameterIuiv = (C.GPSAMPLERPARAMETERIUIV)(getProcAddr("glSamplerParameterIuiv"))
+	if gpSamplerParameterIuiv == nil {
+		return errors.New("glSamplerParameterIuiv")
+	}
 	gpSamplerParameterf = (C.GPSAMPLERPARAMETERF)(getProcAddr("glSamplerParameterf"))
+	if gpSamplerParameterf == nil {
+		return errors.New("glSamplerParameterf")
+	}
 	gpSamplerParameterfv = (C.GPSAMPLERPARAMETERFV)(getProcAddr("glSamplerParameterfv"))
+	if gpSamplerParameterfv == nil {
+		return errors.New("glSamplerParameterfv")
+	}
 	gpSamplerParameteri = (C.GPSAMPLERPARAMETERI)(getProcAddr("glSamplerParameteri"))
+	if gpSamplerParameteri == nil {
+		return errors.New("glSamplerParameteri")
+	}
 	gpSamplerParameteriv = (C.GPSAMPLERPARAMETERIV)(getProcAddr("glSamplerParameteriv"))
+	if gpSamplerParameteriv == nil {
+		return errors.New("glSamplerParameteriv")
+	}
 	gpScissor = (C.GPSCISSOR)(getProcAddr("glScissor"))
 	if gpScissor == nil {
 		return errors.New("glScissor")
@@ -15669,6 +15737,10 @@ func InitWithProcAddrFunc(getProcAddr func(name string) unsafe.Pointer) error {
 		return errors.New("glVertexAttrib4usv")
 	}
 	gpVertexAttribBinding = (C.GPVERTEXATTRIBBINDING)(getProcAddr("glVertexAttribBinding"))
+	gpVertexAttribDivisor = (C.GPVERTEXATTRIBDIVISOR)(getProcAddr("glVertexAttribDivisor"))
+	if gpVertexAttribDivisor == nil {
+		return errors.New("glVertexAttribDivisor")
+	}
 	gpVertexAttribDivisorARB = (C.GPVERTEXATTRIBDIVISORARB)(getProcAddr("glVertexAttribDivisorARB"))
 	gpVertexAttribFormat = (C.GPVERTEXATTRIBFORMAT)(getProcAddr("glVertexAttribFormat"))
 	gpVertexAttribFormatNV = (C.GPVERTEXATTRIBFORMATNV)(getProcAddr("glVertexAttribFormatNV"))
@@ -15788,13 +15860,37 @@ func InitWithProcAddrFunc(getProcAddr func(name string) unsafe.Pointer) error {
 	gpVertexAttribLFormatNV = (C.GPVERTEXATTRIBLFORMATNV)(getProcAddr("glVertexAttribLFormatNV"))
 	gpVertexAttribLPointer = (C.GPVERTEXATTRIBLPOINTER)(getProcAddr("glVertexAttribLPointer"))
 	gpVertexAttribP1ui = (C.GPVERTEXATTRIBP1UI)(getProcAddr("glVertexAttribP1ui"))
+	if gpVertexAttribP1ui == nil {
+		return errors.New("glVertexAttribP1ui")
+	}
 	gpVertexAttribP1uiv = (C.GPVERTEXATTRIBP1UIV)(getProcAddr("glVertexAttribP1uiv"))
+	if gpVertexAttribP1uiv == nil {
+		return errors.New("glVertexAttribP1uiv")
+	}
 	gpVertexAttribP2ui = (C.GPVERTEXATTRIBP2UI)(getProcAddr("glVertexAttribP2ui"))
+	if gpVertexAttribP2ui == nil {
+		return errors.New("glVertexAttribP2ui")
+	}
 	gpVertexAttribP2uiv = (C.GPVERTEXATTRIBP2UIV)(getProcAddr("glVertexAttribP2uiv"))
+	if gpVertexAttribP2uiv == nil {
+		return errors.New("glVertexAttribP2uiv")
+	}
 	gpVertexAttribP3ui = (C.GPVERTEXATTRIBP3UI)(getProcAddr("glVertexAttribP3ui"))
+	if gpVertexAttribP3ui == nil {
+		return errors.New("glVertexAttribP3ui")
+	}
 	gpVertexAttribP3uiv = (C.GPVERTEXATTRIBP3UIV)(getProcAddr("glVertexAttribP3uiv"))
+	if gpVertexAttribP3uiv == nil {
+		return errors.New("glVertexAttribP3uiv")
+	}
 	gpVertexAttribP4ui = (C.GPVERTEXATTRIBP4UI)(getProcAddr("glVertexAttribP4ui"))
+	if gpVertexAttribP4ui == nil {
+		return errors.New("glVertexAttribP4ui")
+	}
 	gpVertexAttribP4uiv = (C.GPVERTEXATTRIBP4UIV)(getProcAddr("glVertexAttribP4uiv"))
+	if gpVertexAttribP4uiv == nil {
+		return errors.New("glVertexAttribP4uiv")
+	}
 	gpVertexAttribPointer = (C.GPVERTEXATTRIBPOINTER)(getProcAddr("glVertexAttribPointer"))
 	if gpVertexAttribPointer == nil {
 		return errors.New("glVertexAttribPointer")
