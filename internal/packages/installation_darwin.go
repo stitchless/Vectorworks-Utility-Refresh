@@ -63,7 +63,6 @@ func (installation *Installation) setUserData() {
 	switch installation.SoftwareModule {
 	case ModuleVectorworks:
 		installation.Directories = []string{
-			app.HomeDirectory + "/Library/Application\\ Support/Vectorworks\\ RMCache/rm" + installation.Year,
 			app.HomeDirectory + "/Library/Application\\ Support/Vectorworks\\ Cloud\\ Services",
 			app.HomeDirectory + "/Library/Application\\ Support/Vectorworks/" + installation.Year,
 			app.HomeDirectory + "/Library/Application\\ Support/vectorworks-installer-wrapper",
@@ -110,20 +109,115 @@ func (installation *Installation) setLogFile() {
 	installation.LogFile = app.HomeDirectory + "/Library/Application\\ Support/Vectorworks/" + installation.Year + "/VW User Log.txt"
 }
 
-func (installation Installation) Clean() {
-	plistPath := app.HomeDirectory + "/Library/Preferences/"
-	// Deletes relevant plist files for select packages/version
-	for _, plist := range installation.Properties {
-		err := os.RemoveAll(plistPath + plist)
+//
+// CLEANING SECTION
+//
+
+func (installation *Installation) cleanRMCache() {
+	// check that a directory exists
+	if _, err := os.Stat(installation.RMCache); os.IsNotExist(err) {
+		app.SoftwareOutputString = append(app.SoftwareOutputString, "No Resource Manager Cache found.")
+		_ = errors.New("RMCache directory does not exist")
+	}
+
+	// Attempt to remove the directory
+	err := os.RemoveAll(installation.RMCache)
+	if err != nil {
+		app.SoftwareOutputString = append(app.SoftwareOutputString, "error: could not delete the directory at: "+installation.RMCache)
+		_ = errors.New("error: could not delete the directory: " + installation.RMCache)
+	}
+	app.SoftwareOutputString = append(app.SoftwareOutputString, fmt.Sprintf("%s - deleted the directory: %s", installation.SoftwareModule, installation.RMCache))
+}
+
+func (installation *Installation) cleanUserData() {
+	for _, directory := range installation.Directories {
+
+		// check that a directory exists
+		if _, err := os.Stat(directory); os.IsNotExist(err) {
+			app.SoftwareOutputString = append(app.SoftwareOutputString, "No directory found at: "+directory)
+		}
+
+		app.SoftwareOutputString = append(app.SoftwareOutputString, fmt.Sprintf("Cleaning %s...", directory))
+
+		err := os.RemoveAll(directory)
 		if err != nil {
-			errors.New("error: could not remove the plist file: " + plistPath + plist)
+			app.SoftwareOutputString = append(app.SoftwareOutputString, "error: could not delete the directory at: "+directory)
+			_ = errors.New("error: could not delete the directory: " + directory)
+		}
+		app.SoftwareOutputString = append(app.SoftwareOutputString, fmt.Sprintf("%s - deleted the directory: %s", installation.SoftwareModule, directory))
+	}
+}
+
+func (installation *Installation) cleanUserSettings() {
+	for _, property := range installation.Properties {
+		// check that a property exists
+		if _, err := os.Stat(app.HomeDirectory + "/Library/Preferences/" + property); os.IsNotExist(err) {
+			app.SoftwareOutputString = append(app.SoftwareOutputString, "No property found at: "+property)
+		}
+
+		app.SoftwareOutputString = append(app.SoftwareOutputString, fmt.Sprintf("Cleaning %s...", property))
+
+		err := os.Remove(app.HomeDirectory + "/Library/Preferences/" + property)
+		if err != nil {
+			app.SoftwareOutputString = append(app.SoftwareOutputString, "error: could not delete the property at: "+property)
+			_ = errors.New("error: could not delete the property: " + property)
+		}
+		app.SoftwareOutputString = append(app.SoftwareOutputString, fmt.Sprintf("%s - deleted the property: %s", installation.SoftwareModule, property))
+	}
+}
+
+func (installation *Installation) cleanInstallers() error {
+	//for _, installer := range installation.Installers {
+	//	err := os.Remove(installer)
+	//	if err != nil {
+	//		return errors.New("error: could not delete the installer: " + installer)
+	//	}
+	//}
+
+	// Not yet implemented
+	// TODO: implement this function
+
+	return nil
+}
+
+func (installation *Installation) cleanAll() {
+	installation.cleanRMCache()
+	installation.cleanUserData()
+	installation.cleanUserSettings()
+	_ = installation.cleanInstallers()
+}
+
+func (installation Installation) Clean() error {
+	app.SoftwareOutputString = append(app.SoftwareOutputString, fmt.Sprintf("%s - cleaning...", installation.SoftwareModule))
+
+	if installation.CleanOptions.RemoveAllData {
+		app.SoftwareOutputString = append(app.SoftwareOutputString, "Cleaning all data...")
+		installation.cleanAll()
+		return nil
+	}
+
+	if installation.CleanOptions.RemoveRMC {
+		app.SoftwareOutputString = append(app.SoftwareOutputString, "Cleaning Resource Manager Cache...")
+		installation.cleanRMCache()
+	}
+
+	if installation.CleanOptions.RemoveUserData {
+		app.SoftwareOutputString = append(app.SoftwareOutputString, "Cleaning user data...")
+		installation.cleanUserData()
+	}
+
+	if installation.CleanOptions.RemoveUserSettings {
+		app.SoftwareOutputString = append(app.SoftwareOutputString, "Cleaning user settings...")
+		installation.cleanUserSettings()
+	}
+
+	if installation.CleanOptions.RemoveInstallerSettings {
+		app.SoftwareOutputString = append(app.SoftwareOutputString, "Cleaning installers...")
+		err := installation.cleanInstallers()
+		if err != nil {
+			return err
 		}
 	}
 
-	for _, directory := range installation.Directories {
-		err := os.RemoveAll(directory)
-		if err != nil {
-			errors.New("error: could not delete the directory: " + directory)
-		}
-	}
+	return nil
 }

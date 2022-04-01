@@ -5,6 +5,7 @@ import (
 	"github.com/inkyblackness/imgui-go/v4"
 	"github.com/jpeizer/Vectorworks-Utility-Refresh/internal/packages"
 	"github.com/jpeizer/Vectorworks-Utility-Refresh/internal/utils"
+	"strings"
 )
 
 var (
@@ -13,7 +14,6 @@ var (
 
 // RenderSoftware shows serials of found supported packages
 func RenderSoftware() {
-	var item int32 = 0
 	// Start of packages tab bar
 	imgui.BeginTabBar("##SoftwareTabBar")
 	// Run for all active supported packages
@@ -23,13 +23,15 @@ func RenderSoftware() {
 			continue
 		}
 		// Insert new tab for each installed supported packages
-		if imgui.BeginTabItem(swPkg.Name + "##" + swPkg.Name + "TabItem") {
+		imgui.PushID(swPkg.Name)
+		if imgui.BeginTabItem(swPkg.Name) {
 			// Begin of packages year tab bar
-			imgui.BeginTabBar("##" + swPkg.Name + "TabBar")
+			imgui.BeginTabBar("TabBar")
 			// Find all installed packages versions
 			for _, installation := range swPkg.Installations {
 				// Insert a new tab for all packages versions found
-				if imgui.BeginTabItem(installation.Year + "##" + swPkg.Name + installation.Year + "TabItem") {
+				imgui.PushID(installation.Year)
+				if imgui.BeginTabItem(installation.Year) {
 					// ----------------------------
 					// LAYOUT FOR SOFTWARE FEATURES
 					// ----------------------------
@@ -39,9 +41,9 @@ func RenderSoftware() {
 					imgui.PushItemWidth(350)
 					// Flags 2 InputTextFlagsCharsUppercase | 4 InputTextFlagsAutoSelectAll | InputTextFlagsEnterReturnsTrue
 					if imgui.InputTextV("##EditedSerial", &installation.License.Serial, 1<<2|1<<4|1<<5, nil) {
-						err := packages.ReplaceOldSerial(installation, installation.License.Serial)
+						err := packages.ReplaceOldSerial(*installation, installation.License.Serial)
 						if err != nil {
-							fmt.Errorf("error replacing old serial: %s", err)
+							_ = fmt.Errorf("error replacing old serial: %s", err)
 						}
 						//err := packages.GenerateInstalledSoftwareMap()
 						//if err != nil {
@@ -59,7 +61,7 @@ func RenderSoftware() {
 					// Installation Info Button
 					imgui.SameLine()
 					imgui.PushFont(utils.FontAwesomeLight)
-					if imgui.ButtonV("\uF05A Info"+"##"+installation.Year+"licenseButton", imgui.Vec2{X: 70, Y: 25}) {
+					if imgui.ButtonV("\uF05A Info", imgui.Vec2{X: 70, Y: 25}) {
 						toggleSerialDetails = !toggleSerialDetails
 					}
 
@@ -70,29 +72,23 @@ func RenderSoftware() {
 						imgui.Separator()
 						imgui.Dummy(imgui.Vec2{X: 0, Y: 5})
 
-						imgui.Checkbox("Remove resource manager cache##RMC", &installation.CleanOptions.RemoveRMC)
-						imgui.Checkbox("Remove user data##RMUD", &installation.CleanOptions.RemoveUserData)
-						imgui.Checkbox("Remove user settings##RMUS", &installation.CleanOptions.RemoveUserSettings)
-						imgui.Checkbox("Remove installer files##RMIF", &installation.CleanOptions.RemoveInstallerSettings)
-						imgui.Checkbox("Remove all user data##RMALL", &installation.CleanOptions.RemoveAllData)
+						imgui.Checkbox("Remove resource manager cache", &installation.CleanOptions.RemoveRMC)
+						imgui.Checkbox("Remove user folder data", &installation.CleanOptions.RemoveUserData)
+						imgui.Checkbox("Remove user settings", &installation.CleanOptions.RemoveUserSettings)
+						imgui.Checkbox("Remove installer files", &installation.CleanOptions.RemoveInstallerSettings)
+						imgui.Checkbox("Remove all user data", &installation.CleanOptions.RemoveAllData)
 
 						imgui.Dummy(imgui.Vec2{X: 0, Y: 5})
 						imgui.Separator()
 						imgui.Dummy(imgui.Vec2{X: 0, Y: 5})
 
 						if imgui.Button("Remove") {
-
-							//"Remove user data",
-							//"Remove user settings",
-							//"Remove installer files",
-							//"Remove all user data",
-							//packages.RemoveSoftware(installation)
-							fmt.Printf("Remove user data: %v\n", installation)
+							err := installation.Clean()
+							if err != nil {
+								_ = fmt.Errorf("error cleaning installation: %s", err)
+							}
 							imgui.CloseCurrentPopup()
-							//err := packages.GenerateInstalledSoftwareMap()
-							//if err != nil {
-							//	fmt.Errorf("error updating internal installation data after serial update %v", err)
-							//}
+							application.Refresh()
 						}
 						imgui.SameLine()
 						if imgui.Button("Cancel") {
@@ -155,19 +151,25 @@ func RenderSoftware() {
 					imgui.Text("Output")
 					imgui.PopFont()
 					imgui.BeginChildV("##optionsChild", imgui.Vec2{X: 0, Y: 0}, true, 0)
-					imgui.Text(fmt.Sprintf("%v", item))
+					// Text field for any output.
+					if len(application.SoftwareOutputString) == 0 {
+						imgui.Text("No output data yet...")
+					}
+					imgui.Text(strings.Join(application.SoftwareOutputString, "\n"))
 					imgui.EndChild()
 					imgui.EndGroup()
 
 					// End TABS
 					imgui.EndTabItem()
 				}
+				imgui.PopID()
 			}
 			// Ending the packages version tab bar
 			imgui.EndTabBar()
 			// Ending the packages name tab content
 			imgui.EndTabItem()
 		}
+		imgui.PopID()
 	}
 	// Ending the packages name tab bar
 	imgui.EndTabBar()
