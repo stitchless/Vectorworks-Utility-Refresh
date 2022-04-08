@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"github.com/inkyblackness/imgui-go/v4"
 	"github.com/jpeizer/Vectorworks-Utility-Refresh/internal/packages"
 )
 
@@ -12,17 +11,17 @@ type featureName string
 
 // hard coded feature names that are possible for all implemented packages packages
 const (
-	featureSoftware         featureName = "Software"
+	featureSoftware featureName = "Software"
 	//featureTraceApplication featureName = "Trace Application"
-	featureDemoWindow       featureName = "Demo Window"
-	featureSettings         featureName = "Settings"
+	//featureDemoWindow       featureName = "Demo Window"
+	featureSettings featureName = "Settings"
 )
 
 // AllActiveFeatures is a list of all the currently supported features the application supports
 var AllActiveFeatures = []featureName{
 	featureSoftware,
 	//featureTraceApplication,
-	featureDemoWindow,
+	//featureDemoWindow,
 	//featureSettings,
 }
 
@@ -49,9 +48,9 @@ func (f featureName) Render() {
 		RenderSoftware()
 	//case featureTraceApplication:
 	//	RenderTraceApplication()
-	case featureDemoWindow:
-		open := true
-		imgui.ShowDemoWindow(&open)
+	//case featureDemoWindow:
+	//	open := true
+	//	imgui.ShowDemoWindow(&open)
 	//case featureSettings:
 	//	RenderSettings()
 	default:

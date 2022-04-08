@@ -49,8 +49,8 @@ type Renderer interface {
 }
 
 const (
-	millisPerSecond = 1000
-	sleepDuration   = time.Millisecond * 5
+	//millisPerSecond = 1000
+	sleepDuration = time.Millisecond * 10
 )
 
 // Run implements the main program loop of the demo. It returns when the platform signals to stop.
@@ -86,7 +86,7 @@ func Run(p Platform, r Renderer) {
 
 			numberOfButtons := len(ui.AllActiveFeatures)
 
-			imgui.BeginTableV("Features##TopMenuBar", numberOfButtons, 0, imgui.Vec2{X: -1, Y: 30}, -1)
+			imgui.BeginTableV("Features", numberOfButtons, 0, imgui.Vec2{X: -1, Y: 30}, -1)
 			imgui.TableNextRowV(0, 30)
 
 			for _, activeFeature := range ui.AllActiveFeatures {
@@ -105,7 +105,7 @@ func Run(p Platform, r Renderer) {
 					imgui.PushStyleColor(imgui.StyleColorButtonActive, imgui.Vec4{X: 0.06, Y: 0.53, Z: 0.98, W: 1.00})
 				}
 
-				if imgui.ButtonV(activeFeature.String()+"##tab", imgui.Vec2{X: -1, Y: 30}) {
+				if imgui.ButtonV(activeFeature.String(), imgui.Vec2{X: -1, Y: 30}) {
 					activeFeature.SetActive()
 					pressed = !pressed
 					fmt.Println("Active Feature:", activeFeature.String())
